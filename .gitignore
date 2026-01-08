@@ -1,4 +1,5 @@
 node_modules/
 dist/
+apps/dashboard/dist/
 data/
 .env

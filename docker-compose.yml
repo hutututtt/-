@@ -4,5 +4,8 @@ services:
     build: .
     environment:
       - TRADING_MODE=DRY_RUN
+      - CONFIG_PORT=3001
     volumes:
       - ./data:/app/data
+    ports:
+      - "3001:3001"

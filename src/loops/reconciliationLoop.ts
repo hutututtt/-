@@ -7,14 +7,12 @@ import { PodRuntime } from '@pods/podManager.js';
 import { appendEvent } from '@utils/eventStore.js';
 import { writeTradeReport } from '@reports/tradeReport.js';
 
-const MAX_ERRORS_SAFE = 3;
-const MAX_ERRORS_CRASH = 6;
-
 export async function reconciliationLoop(
   broker: ExchangeBroker,
   executionEngine: ExecutionEngine,
   globalMode: ModeFSM,
-  pods: PodRuntime[]
+  pods: PodRuntime[],
+  thresholds: { safe: number; crash: number }
 ) {
   try {
     const [exchangeOrders, exchangePositions] = await Promise.all([
@@ -89,9 +87,9 @@ export async function reconciliationLoop(
     pods.forEach((pod) => {
       pod.errorBudget.reconciliationFailures += 1;
     });
-    if (pods.some((pod) => pod.errorBudget.reconciliationFailures >= MAX_ERRORS_CRASH)) {
+    if (pods.some((pod) => pod.errorBudget.reconciliationFailures >= thresholds.crash)) {
       globalMode.upgrade('CRASH');
-    } else if (pods.some((pod) => pod.errorBudget.reconciliationFailures >= MAX_ERRORS_SAFE)) {
+    } else if (pods.some((pod) => pod.errorBudget.reconciliationFailures >= thresholds.safe)) {
       globalMode.upgrade('SAFE');
     }
     const event: RiskEvent = {

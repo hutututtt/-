@@ -5,6 +5,7 @@ import { ModeFSM } from '@fsm/modeFsm.js';
 import { reconciliationLoop } from '@loops/reconciliationLoop.js';
 import { tradingLoop } from '@loops/tradingLoop.js';
 import { createPods } from '@pods/podManager.js';
+import { loadConfigRegistry } from '@config/registry.js';
 import { ExchangeBroker, ExchangeOrder, ExchangePosition, ExchangeBalance } from '@exchange/types.js';
 
 class FailingBroker implements ExchangeBroker {
@@ -52,11 +53,21 @@ describe('Risk drills', () => {
     const broker = new FailingBroker();
     const engine = new ExecutionEngine(broker);
     const globalMode = new ModeFSM('NORMAL');
-    const pods = createPods(null);
+    const registry = loadConfigRegistry('DRY_RUN');
+    const pods = createPods(Object.values(registry.pods.values), registry.ai.values, null);
 
-    await reconciliationLoop(broker, engine, globalMode, pods);
-    await reconciliationLoop(broker, engine, globalMode, pods);
-    await reconciliationLoop(broker, engine, globalMode, pods);
+    await reconciliationLoop(broker, engine, globalMode, pods, {
+      safe: registry.global.values.risk.errorBudgetSafe,
+      crash: registry.global.values.risk.errorBudgetCrash
+    });
+    await reconciliationLoop(broker, engine, globalMode, pods, {
+      safe: registry.global.values.risk.errorBudgetSafe,
+      crash: registry.global.values.risk.errorBudgetCrash
+    });
+    await reconciliationLoop(broker, engine, globalMode, pods, {
+      safe: registry.global.values.risk.errorBudgetSafe,
+      crash: registry.global.values.risk.errorBudgetCrash
+    });
 
     expect(globalMode.current).toBe('SAFE');
   });
@@ -65,7 +76,8 @@ describe('Risk drills', () => {
     const broker = new TrackingBroker();
     const engine = new ExecutionEngine(broker);
     const globalMode = new ModeFSM('NORMAL');
-    const pods = createPods(null);
+    const registry = loadConfigRegistry('DRY_RUN');
+    const pods = createPods(Object.values(registry.pods.values), registry.ai.values, null);
 
     await tradingLoop(globalMode, pods, engine, () => ({
       symbol: 'BTC-USDT',
@@ -86,9 +98,13 @@ describe('Risk drills', () => {
     ];
     const engine = new ExecutionEngine(broker);
     const globalMode = new ModeFSM('NORMAL');
-    const pods = createPods(null);
+    const registry = loadConfigRegistry('DRY_RUN');
+    const pods = createPods(Object.values(registry.pods.values), registry.ai.values, null);
 
-    await reconciliationLoop(broker, engine, globalMode, pods);
+    await reconciliationLoop(broker, engine, globalMode, pods, {
+      safe: registry.global.values.risk.errorBudgetSafe,
+      crash: registry.global.values.risk.errorBudgetCrash
+    });
 
     expect(broker.placed.length).toBe(1);
     expect(broker.placed[0]?.reduceOnly).toBe(true);
@@ -98,7 +114,8 @@ describe('Risk drills', () => {
     const broker = new TrackingBroker();
     const engine = new ExecutionEngine(broker);
     const globalMode = new ModeFSM('NORMAL');
-    const pods = createPods(null);
+    const registry = loadConfigRegistry('DRY_RUN');
+    const pods = createPods(Object.values(registry.pods.values), registry.ai.values, null);
 
     await tradingLoop(globalMode, pods, engine, () => ({
       symbol: 'BTC-USDT',

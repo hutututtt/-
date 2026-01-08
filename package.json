@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "lint": "eslint . --ext .ts",
     "test": "vitest run",
@@ -10,9 +14,14 @@
     "paper": "TRADING_MODE=PAPER tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "tsx src/index.ts",
-    "reset-modes": "tsx src/cli/resetModes.ts"
+    "reset-modes": "tsx src/cli/resetModes.ts",
+    "dashboard:dev": "npm --workspace apps/dashboard run dev",
+    "dashboard:build": "npm --workspace apps/dashboard run build",
+    "dashboard:preview": "npm --workspace apps/dashboard run preview"
   },
   "dependencies": {
+    "fastify": "^4.28.1",
+    "yaml": "^2.5.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

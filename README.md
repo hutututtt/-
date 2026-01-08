@@ -9,6 +9,11 @@ npm install
 npm run dry-run
 ```
 
+Start dashboard (in another terminal):
+
+```bash
+npm run dashboard:dev
+```
 Run PAPER mode:
 
 ```bash
@@ -30,10 +35,21 @@ TRADING_MODE=LIVE
 - `npm run dry-run` – local mock exchange loop
 - `npm run paper` – mock exchange loop with PAPER mode flag
 - `npm run start` – default start (respects TRADING_MODE)
+- `npm run dashboard:dev` – run the dashboard in dev mode
 - `npm run test` – vitest suite
 - `npm run lint` – eslint
 - `npm run reset-modes` – reset FSM mode back to NORMAL
 
+## Config Center
+
+The dashboard includes a Config Center at `http://localhost:5173` once the dashboard dev server is running. It provides:
+
+- Global / Pod / AI / Effective config tabs with searchable, sortable tables.
+- Config metadata (source, scope, frozen, updatedAt) and per-field descriptions.
+- Effective config hash and build version for audit tracking.
+- Diff view between the current effective config and the previous snapshot stored in localStorage.
+
+`configHash` is derived from a stable, sorted stringify of the effective config values and hashed with SHA-256. `buildVersion` defaults to the package version unless overridden by `BUILD_VERSION`.
 ## 24/7 Operation
 
 - Docker: `docker-compose up --build`

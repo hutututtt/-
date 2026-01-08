@@ -1,6 +1,6 @@
 import { RiskEvent } from '@events/schemas.js';
 import { Mode } from '@fsm/modeFsm.js';
-import { PodConfig } from '@config/riskPods.js';
+import { PodConfig } from '@config/types.js';
 
 export type MarketSnapshot = {
   symbol: string;

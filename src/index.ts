@@ -7,13 +7,16 @@ import { heartbeat } from '@health/heartbeat.js';
 import { reconciliationLoop } from '@loops/reconciliationLoop.js';
 import { tradingLoop } from '@loops/tradingLoop.js';
 import { createPods, snapshotPods } from '@pods/podManager.js';
+import { loadConfigRegistry } from '@config/registry.js';
 import { loadCheckpoint, saveCheckpoint } from '@state/checkpoint.js';
+import { startConfigServer } from '@server/configServer.js';
 
 const tradingMode = (process.env.TRADING_MODE ?? 'DRY_RUN') as TradingMode;
 
+const configRegistry = loadConfigRegistry(tradingMode);
 const checkpoint = loadCheckpoint();
 const globalMode = new ModeFSM(checkpoint?.globalMode ?? 'NORMAL');
-const pods = createPods(checkpoint);
+const pods = createPods(Object.values(configRegistry.pods.values), configRegistry.ai.values, checkpoint);
 
 const broker: ExchangeBroker = tradingMode === 'LIVE' ? new OkxBroker() : new MockExchange();
 const executionEngine = new ExecutionEngine(broker);
@@ -28,18 +31,24 @@ const snapshotGenerator = () => ({
   volatility: Math.random()
 });
 
+const tradingIntervals = configRegistry.global.values.trading;
+const riskThresholds = configRegistry.global.values.risk;
+
 setInterval(() => {
-  reconciliationLoop(broker, executionEngine, globalMode, pods);
-}, 2000);
+  reconciliationLoop(broker, executionEngine, globalMode, pods, {
+    safe: riskThresholds.errorBudgetSafe,
+    crash: riskThresholds.errorBudgetCrash
+  });
+}, tradingIntervals.reconciliationIntervalMs);
 
 setInterval(() => {
   tradingLoop(globalMode, pods, executionEngine, snapshotGenerator);
   cycleId += 1;
-}, 8000);
+}, tradingIntervals.tradingIntervalMs);
 
 setInterval(() => {
   heartbeat(globalMode.current, pods);
-}, 15000);
+}, tradingIntervals.heartbeatIntervalMs);
 
 setInterval(() => {
   saveCheckpoint({
@@ -47,6 +56,8 @@ setInterval(() => {
     pods: snapshotPods(pods),
     lastCycleId: cycleId
   });
-}, 10000);
+}, tradingIntervals.checkpointIntervalMs);
+
+startConfigServer(configRegistry, Number(process.env.CONFIG_PORT ?? 3001));
 
 console.log(`Autopilot trader started in ${tradingMode} mode.`);

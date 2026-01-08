@@ -1,5 +1,5 @@
 import { frozenCopy } from '@config/frozen.js';
-import { POD_CONFIGS, PodConfig } from '@config/riskPods.js';
+import { AiConfig, PodConfig } from '@config/types.js';
 import { ModeFSM } from '@fsm/modeFsm.js';
 import { OrderFSM } from '@fsm/orderFsm.js';
 import { PositionFSM } from '@fsm/positionFsm.js';
@@ -12,6 +12,7 @@ export type ErrorBudget = {
 
 export type PodRuntime = {
   config: PodConfig;
+  aiProfile: AiConfig;
   mode: ModeFSM;
   orders: OrderFSM;
   positions: PositionFSM;
@@ -20,8 +21,12 @@ export type PodRuntime = {
   currentCapital: number;
 };
 
-export function createPods(checkpoint: GlobalCheckpoint | null): PodRuntime[] {
-  const frozenConfigs = frozenCopy(POD_CONFIGS);
+export function createPods(
+  podConfigs: PodConfig[],
+  aiConfigs: Record<string, AiConfig>,
+  checkpoint: GlobalCheckpoint | null
+): PodRuntime[] {
+  const frozenConfigs = frozenCopy(podConfigs);
   return frozenConfigs.map((config) => {
     const podCheckpoint = checkpoint?.pods.find((pod) => pod.podId === config.id) ?? null;
     const mode = new ModeFSM(podCheckpoint?.mode ?? config.mode);
@@ -35,7 +40,16 @@ export function createPods(checkpoint: GlobalCheckpoint | null): PodRuntime[] {
       apiErrors: podCheckpoint?.errorBudget.apiErrors ?? 0,
       reconciliationFailures: podCheckpoint?.errorBudget.reconciliationFailures ?? 0
     };
-    return {\n+      config,\n+      mode,\n+      orders,\n+      positions,\n+      errorBudget,\n+      learningPaused: false,\n+      currentCapital: config.capitalPool\n+    };
+    return {
+      config,
+      aiProfile: aiConfigs[config.id],
+      mode,
+      orders,
+      positions,
+      errorBudget,
+      learningPaused: false,
+      currentCapital: config.capitalPool
+    };
   });
 }
 

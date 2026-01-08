@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AiProfile } from '@config/riskPods.js';
+import { AiConfig } from '@config/types.js';
 import { AiRecommendationEvent, AiRecommendationSchema } from '@events/schemas.js';
 
 const AiSuggestionSchema = z.object({
@@ -10,7 +10,7 @@ const AiSuggestionSchema = z.object({
 
 export type AiSuggestion = z.infer<typeof AiSuggestionSchema>;
 
-export function runAiOrchestrator(podId: string, profile: AiProfile): AiRecommendationEvent {
+export function runAiOrchestrator(podId: string, profile: AiConfig): AiRecommendationEvent {
   const suggestion: AiSuggestion = {
     suggestion: Math.random() > 0.6 ? 'APPROVE' : Math.random() > 0.5 ? 'REJECT' : 'ABSTAIN',
     confidence: Number((profile.regimeWeight + profile.riskWeight).toFixed(2)),

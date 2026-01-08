@@ -122,7 +122,7 @@ export async function tradingLoop(
         : specMomentumStrategy(pod.config.id, snapshot);
     appendEvent(signal);
 
-    const aiRecommendation = AiRecommendationSchema.parse(runAiOrchestrator(pod.config.id, pod.config.aiProfile));
+    const aiRecommendation = AiRecommendationSchema.parse(runAiOrchestrator(pod.config.id, pod.aiProfile));
     appendEvent(aiRecommendation);
 
     const consensus = consensusEngine(pod.config.id, signal, aiRecommendation);
