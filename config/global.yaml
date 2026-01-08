@@ -1,0 +1,8 @@
+trading:
+  reconciliationIntervalMs: 2000
+  tradingIntervalMs: 8000
+  heartbeatIntervalMs: 15000
+  checkpointIntervalMs: 10000
+risk:
+  errorBudgetSafe: 3
+  errorBudgetCrash: 6

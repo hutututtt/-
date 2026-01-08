@@ -1,0 +1,182 @@
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #e5e7eb;
+  background: #0f172a;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  margin: 0 0 8px 0;
+}
+
+.pill {
+  padding: 6px 12px;
+  background: #1e293b;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #1e293b;
+  border-color: #38bdf8;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filters input,
+.filters select,
+button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.config-table th,
+.config-table td {
+  border-bottom: 1px solid #1e293b;
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.config-table tbody tr:hover {
+  background: #111827;
+}
+
+.key-cell {
+  font-weight: 600;
+}
+
+.value-cell {
+  color: #94a3b8;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #1e293b;
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+.badge-frozen {
+  background: #ef4444;
+}
+
+.badge-source {
+  background: #0ea5e9;
+}
+
+.badge-scope {
+  background: #22c55e;
+}
+
+.sort-button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100%;
+  background: #0b1120;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
+  padding: 24px;
+}
+
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.drawer-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.close-button {
+  align-self: flex-end;
+}
+
+.effective-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.diff-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+  background: #111827;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.error {
+  color: #f97316;
+}

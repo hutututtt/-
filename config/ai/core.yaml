@@ -1,0 +1,7 @@
+podId: core
+regimeWeight: 0.5
+auditorWeight: 0.3
+riskWeight: 0.2
+learningRate: 0.02
+minSamples: 50
+maxDeltaPercent: 5

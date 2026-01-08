@@ -1,0 +1,7 @@
+podId: spec
+regimeWeight: 0.4
+auditorWeight: 0.4
+riskWeight: 0.2
+learningRate: 0.03
+minSamples: 20
+maxDeltaPercent: 5

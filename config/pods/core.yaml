@@ -1,0 +1,15 @@
+id: core
+name: Core Pod
+mode: NORMAL
+capitalPool: 1000
+riskLimits:
+  leverage: 1
+  maxDailyLoss: 50
+  maxDrawdown: 100
+  maxOpenPositions: 3
+  maxNotionalPerTrade: 100
+  requireStopLoss: true
+  maxHoldingMinutes: 1440
+  allowScaleIn: false
+strategy: CORE_TREND
+orderTagPrefix: CORE

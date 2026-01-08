@@ -1,0 +1,15 @@
+id: spec
+name: Speculative Pod
+mode: NORMAL
+capitalPool: 200
+riskLimits:
+  leverage: 10
+  maxDailyLoss: 200
+  maxDrawdown: 200
+  maxOpenPositions: 1
+  maxNotionalPerTrade: 0.8
+  requireStopLoss: true
+  maxHoldingMinutes: 60
+  allowScaleIn: false
+strategy: SPEC_MOMENTUM
+orderTagPrefix: SPEC
