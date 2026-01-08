@@ -12,24 +12,62 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ai/*": ["src/ai/*"],
-      "@exchange/*": ["src/exchange/*"],
-      "@execution/*": ["src/execution/*"],
-      "@risk/*": ["src/risk/*"],
-      "@events/*": ["src/events/*"],
-      "@fsm/*": ["src/fsm/*"],
-      "@state/*": ["src/state/*"],
-      "@pods/*": ["src/pods/*"],
-      "@loops/*": ["src/loops/*"],
-      "@strategies/*": ["src/strategies/*"],
-      "@consensus/*": ["src/consensus/*"],
-      "@reports/*": ["src/reports/*"],
-      "@utils/*": ["src/utils/*"],
-      "@config/*": ["src/config/*"],
-      "@server/*": ["src/server/*"],
-      "@shared-types": ["packages/shared-types/src/index.ts"]
+      "@ai/*": [
+        "src/ai/*"
+      ],
+      "@exchange/*": [
+        "src/exchange/*"
+      ],
+      "@execution/*": [
+        "src/execution/*"
+      ],
+      "@risk/*": [
+        "src/risk/*"
+      ],
+      "@events/*": [
+        "src/events/*"
+      ],
+      "@fsm/*": [
+        "src/fsm/*"
+      ],
+      "@state/*": [
+        "src/state/*"
+      ],
+      "@pods/*": [
+        "src/pods/*"
+      ],
+      "@loops/*": [
+        "src/loops/*"
+      ],
+      "@strategies/*": [
+        "src/strategies/*"
+      ],
+      "@consensus/*": [
+        "src/consensus/*"
+      ],
+      "@reports/*": [
+        "src/reports/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ],
+      "@server/*": [
+        "src/server/*"
+      ],
+      "@shared-types": [
+        "packages/shared-types/src/index.ts"
+      ]
     }
   },
-  "include": ["src", "tests"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src",
+    "tests"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

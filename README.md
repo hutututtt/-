@@ -14,7 +14,6 @@ Start dashboard (in another terminal):
 ```bash
 npm run dashboard:dev
 ```
-
 Run PAPER mode:
 
 ```bash
@@ -51,7 +50,6 @@ The dashboard includes a Config Center at `http://localhost:5173` once the dashb
 - Diff view between the current effective config and the previous snapshot stored in localStorage.
 
 `configHash` is derived from a stable, sorted stringify of the effective config values and hashed with SHA-256. `buildVersion` defaults to the package version unless overridden by `BUILD_VERSION`.
-
 ## 24/7 Operation
 
 - Docker: `docker-compose up --build`
@@ -65,3 +63,4 @@ The dashboard includes a Config Center at `http://localhost:5173` once the dashb
 - All orders pass through three gates (PreTradeRiskGate, OrderPermissionGate, ExecutionAdmissionGate).
 - Risk modes only upgrade (NORMAL → SAFE → CRASH). Downgrade via `npm run reset-modes`.
 - SAFE/CRASH default to reduce-only behavior.
+
