@@ -16,6 +16,7 @@ export default defineConfig({
       '@state': path.resolve(__dirname, 'src/state'),
       '@pods': path.resolve(__dirname, 'src/pods'),
       '@loops': path.resolve(__dirname, 'src/loops'),
+      '@health': path.resolve(__dirname, 'src/health'),
       '@strategies': path.resolve(__dirname, 'src/strategies'),
       '@consensus': path.resolve(__dirname, 'src/consensus'),
       '@reports': path.resolve(__dirname, 'src/reports'),

@@ -35,7 +35,15 @@ export function createPods(checkpoint: GlobalCheckpoint | null): PodRuntime[] {
       apiErrors: podCheckpoint?.errorBudget.apiErrors ?? 0,
       reconciliationFailures: podCheckpoint?.errorBudget.reconciliationFailures ?? 0
     };
-    return {\n+      config,\n+      mode,\n+      orders,\n+      positions,\n+      errorBudget,\n+      learningPaused: false,\n+      currentCapital: config.capitalPool\n+    };
+    return {
+      config,
+      mode,
+      orders,
+      positions,
+      errorBudget,
+      learningPaused: false,
+      currentCapital: config.capitalPool
+    };
   });
 }
 

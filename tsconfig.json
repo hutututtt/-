@@ -21,6 +21,7 @@
       "@state/*": ["src/state/*"],
       "@pods/*": ["src/pods/*"],
       "@loops/*": ["src/loops/*"],
+      "@health/*": ["src/health/*"],
       "@strategies/*": ["src/strategies/*"],
       "@consensus/*": ["src/consensus/*"],
       "@reports/*": ["src/reports/*"],
