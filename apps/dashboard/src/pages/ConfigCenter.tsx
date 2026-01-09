@@ -24,7 +24,7 @@ const defaultFilters: FilterState = {
     scope: 'all'
 };
 
-const tabs = ['Global Config', 'Pod Config', 'AI Config', 'Effective Config'] as const;
+const tabs = ['全局配置', 'Pod 配置', 'AI 配置', '有效配置'] as const;
 type Tab = (typeof tabs)[number];
 
 const storageKey = 'config-center-effective-snapshot';
@@ -61,11 +61,11 @@ function ConfigTable({ items, onSelect }: { items: ConfigItem[]; onSelect: (item
                 <tr>
                     <th>
                         <button className="sort-button" onClick={() => setAscending(!ascending)}>
-                            Key {ascending ? '▲' : '▼'}
+                            键名 {ascending ? '▲' : '▼'}
                         </button>
                     </th>
-                    <th>Value</th>
-                    <th>Badges</th>
+                    <th>值</th>
+                    <th>标签</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,7 +75,7 @@ function ConfigTable({ items, onSelect }: { items: ConfigItem[]; onSelect: (item
                         <td className="value-cell">{JSON.stringify(item.value)}</td>
                         <td>
                             <span className={item.frozen ? 'badge badge-frozen' : 'badge'}>
-                                {item.frozen ? 'Frozen' : 'Mutable'}
+                                {item.frozen ? '冻结' : '可变'}
                             </span>
                             <span className="badge badge-source">{item.source}</span>
                             <span className="badge badge-scope">{item.scope}</span>
@@ -93,22 +93,22 @@ function Drawer({ item, onClose }: { item: ConfigItem | null; onClose: () => voi
         <div className="drawer">
             <div className="drawer-content">
                 <button className="close-button" onClick={onClose}>
-                    Close
+                    关闭
                 </button>
                 <h3>{item.key}</h3>
-                <p>{item.description || 'No description available.'}</p>
+                <p>{item.description || '暂无描述'}</p>
                 <div className="drawer-grid">
                     <div>
-                        <strong>Value</strong>
+                        <strong>值</strong>
                         <pre>{JSON.stringify(item.value, null, 2)}</pre>
                     </div>
                     <div>
-                        <strong>Metadata</strong>
+                        <strong>元数据</strong>
                         <ul>
-                            <li>Frozen: {String(item.frozen)}</li>
-                            <li>Source: {item.source}</li>
-                            <li>Scope: {item.scope}</li>
-                            <li>Updated At: {item.updatedAt}</li>
+                            <li>冻结: {String(item.frozen)}</li>
+                            <li>来源: {item.source}</li>
+                            <li>作用域: {item.scope}</li>
+                            <li>更新时间: {item.updatedAt}</li>
                         </ul>
                     </div>
                 </div>
@@ -118,7 +118,7 @@ function Drawer({ item, onClose }: { item: ConfigItem | null; onClose: () => voi
 }
 
 export function ConfigCenter() {
-    const [activeTab, setActiveTab] = useState<Tab>('Global Config');
+    const [activeTab, setActiveTab] = useState<Tab>('全局配置');
     const [selectedItem, setSelectedItem] = useState<ConfigItem | null>(null);
     const [filters, setFilters] = useState<FilterState>(defaultFilters);
     const [selectedPod, setSelectedPod] = useState('core');
@@ -183,7 +183,7 @@ export function ConfigCenter() {
     const saveSnapshot = () => {
         const snapshot = Object.fromEntries(effectiveItems.map((item) => [item.key, item.value]));
         localStorage.setItem(storageKey, JSON.stringify(snapshot));
-        alert('Snapshot saved!');
+        alert('快照已保存！');
     };
 
     const exportJson = () => {
@@ -200,8 +200,8 @@ export function ConfigCenter() {
         <div className="config-center">
             <header>
                 <div>
-                    <h1>Config Center</h1>
-                    <p>Build: {summary?.buildVersion ?? 'loading'} · Hash: {summary?.configHash}</p>
+                    <h1>配置中心</h1>
+                    <p>版本: {summary?.buildVersion ?? '加载中'} · 哈希: {summary?.configHash}</p>
                 </div>
             </header>
 
@@ -220,11 +220,11 @@ export function ConfigCenter() {
                 ))}
             </nav>
 
-            {activeTab === 'Global Config' && (
+            {activeTab === '全局配置' && (
                 <section>
                     <div className="filters">
                         <input
-                            placeholder="Search key"
+                            placeholder="搜索键名"
                             value={filters.query}
                             onChange={(event) => setFilters({ ...filters, query: event.target.value })}
                         />
@@ -232,85 +232,85 @@ export function ConfigCenter() {
                             value={filters.frozen}
                             onChange={(event) => setFilters({ ...filters, frozen: event.target.value as FilterState['frozen'] })}
                         >
-                            <option value="all">Frozen: all</option>
-                            <option value="true">Frozen: true</option>
-                            <option value="false">Frozen: false</option>
+                            <option value="all">冻结: 全部</option>
+                            <option value="true">冻结: 是</option>
+                            <option value="false">冻结: 否</option>
                         </select>
                         <select
                             value={filters.source}
                             onChange={(event) => setFilters({ ...filters, source: event.target.value as FilterState['source'] })}
                         >
-                            <option value="all">Source: all</option>
-                            <option value="yaml">Source: yaml</option>
-                            <option value="env">Source: env</option>
-                            <option value="default">Source: default</option>
-                            <option value="computed">Source: computed</option>
+                            <option value="all">来源: 全部</option>
+                            <option value="yaml">来源: yaml</option>
+                            <option value="env">来源: env</option>
+                            <option value="default">来源: 默认</option>
+                            <option value="computed">来源: 计算</option>
                         </select>
                     </div>
                     {globalConfig ? (
                         <ConfigTable items={filteredGlobal} onSelect={setSelectedItem} />
                     ) : (
-                        <p>Loading...</p>
+                        <p>加载中...</p>
                     )}
                 </section>
             )}
 
-            {activeTab === 'Pod Config' && (
+            {activeTab === 'Pod 配置' && (
                 <section>
                     <div className="filters">
                         <select value={selectedPod} onChange={(event) => setSelectedPod(event.target.value)}>
-                            <option value="core">Core Pod</option>
-                            <option value="spec">Speculative Pod</option>
+                            <option value="core">核心策略</option>
+                            <option value="spec">投机策略</option>
                         </select>
                     </div>
                     {podsConfig ? (
                         <ConfigTable items={filteredPod} onSelect={setSelectedItem} />
                     ) : (
-                        <p>Loading...</p>
+                        <p>加载中...</p>
                     )}
                 </section>
             )}
 
-            {activeTab === 'AI Config' && (
+            {activeTab === 'AI 配置' && (
                 <section>
                     <div className="filters">
                         <select value={selectedPod} onChange={(event) => setSelectedPod(event.target.value)}>
-                            <option value="core">Core Pod</option>
-                            <option value="spec">Speculative Pod</option>
+                            <option value="core">核心策略</option>
+                            <option value="spec">投机策略</option>
                         </select>
                     </div>
                     {effectiveConfig ? (
                         <ConfigTable items={filteredAi} onSelect={setSelectedItem} />
                     ) : (
-                        <p>Loading...</p>
+                        <p>加载中...</p>
                     )}
                 </section>
             )}
 
-            {activeTab === 'Effective Config' && (
+            {activeTab === '有效配置' && (
                 <section>
                     <div className="effective-header">
                         <div>
-                            <p>Build Version: {effectiveConfig?.buildVersion ?? 'loading'}</p>
-                            <p>Config Hash: {effectiveConfig?.configHash ?? 'loading'}</p>
+                            <p>构建版本: {effectiveConfig?.buildVersion ?? '加载中'}</p>
+                            <p>配置哈希: {effectiveConfig?.configHash ?? '加载中'}</p>
                         </div>
                         <div className="button-group">
-                            <button onClick={exportJson}>Export JSON</button>
-                            <button onClick={saveSnapshot}>Save Snapshot</button>
+                            <button onClick={exportJson}>导出 JSON</button>
+                            <button onClick={saveSnapshot}>保存快照</button>
                         </div>
                     </div>
                     {diffResult && (
                         <div className="diff-panel">
                             <div>
-                                <h4>Added</h4>
+                                <h4>新增</h4>
                                 <ul>{diffResult.added.map((key) => <li key={key}>{key}</li>)}</ul>
                             </div>
                             <div>
-                                <h4>Removed</h4>
+                                <h4>删除</h4>
                                 <ul>{diffResult.removed.map((key) => <li key={key}>{key}</li>)}</ul>
                             </div>
                             <div>
-                                <h4>Changed</h4>
+                                <h4>变更</h4>
                                 <ul>{diffResult.changed.map((key) => <li key={key}>{key}</li>)}</ul>
                             </div>
                         </div>
@@ -318,7 +318,7 @@ export function ConfigCenter() {
                     {effectiveConfig ? (
                         <ConfigTable items={effectiveItems} onSelect={setSelectedItem} />
                     ) : (
-                        <p>Loading...</p>
+                        <p>加载中...</p>
                     )}
                 </section>
             )}

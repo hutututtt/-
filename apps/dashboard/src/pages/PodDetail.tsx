@@ -95,7 +95,6 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
         return () => clearInterval(interval);
     }, [podId]);
 
-    // Update pod data when relevant events arrive
     useEffect(() => {
         const relevantEvent = events.find((e) => {
             const event = e as { podId?: string };
@@ -107,11 +106,11 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
     }, [events, podId]);
 
     if (loading) {
-        return <div className="loading">Loading Pod Details...</div>;
+        return <div className="loading">加载策略详情...</div>;
     }
 
     if (!pod) {
-        return <div className="error">Pod not found</div>;
+        return <div className="error">未找到策略</div>;
     }
 
     const pnlPercent = ((pod.runtime.pnl / pod.config.capitalPool) * 100).toFixed(2);
@@ -121,7 +120,7 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
         <div className="pod-detail">
             <div className="pod-detail-header">
                 <button className="back-button" onClick={onBack}>
-                    ← Back
+                    ← 返回
                 </button>
                 <div>
                     <h1>{pod.name}</h1>
@@ -132,20 +131,20 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
             </div>
 
             <div className="pod-detail-grid">
-                {/* Capital & P&L Section */}
+                {/* 资金与绩效 */}
                 <div className="detail-section">
-                    <h2>Capital & Performance</h2>
+                    <h2>资金与绩效</h2>
                     <div className="detail-stats">
                         <div className="detail-stat">
-                            <label>Initial Capital</label>
+                            <label>初始资金</label>
                             <div className="stat-value">${pod.config.capitalPool.toFixed(2)}</div>
                         </div>
                         <div className="detail-stat">
-                            <label>Current Capital</label>
+                            <label>当前资金</label>
                             <div className="stat-value">${pod.runtime.currentCapital.toFixed(2)}</div>
                         </div>
                         <div className="detail-stat">
-                            <label>P&L</label>
+                            <label>盈亏</label>
                             <div className={`stat-value ${isProfitable ? 'positive' : 'negative'}`}>
                                 {isProfitable ? '+' : ''}${pod.runtime.pnl.toFixed(2)} ({pnlPercent}%)
                             </div>
@@ -153,98 +152,98 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
                     </div>
                 </div>
 
-                {/* Risk Limits Section */}
+                {/* 风险限制 */}
                 <div className="detail-section">
-                    <h2>Risk Limits</h2>
+                    <h2>风险限制</h2>
                     <div className="detail-table">
                         <div className="detail-row">
-                            <span>Leverage</span>
+                            <span>杠杆倍数</span>
                             <span>{pod.config.riskLimits.leverage}x</span>
                         </div>
                         <div className="detail-row">
-                            <span>Max Daily Loss</span>
+                            <span>最大日损失</span>
                             <span>${pod.config.riskLimits.maxDailyLoss}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Max Drawdown</span>
+                            <span>最大回撤</span>
                             <span>${pod.config.riskLimits.maxDrawdown}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Max Open Positions</span>
+                            <span>最大持仓数</span>
                             <span>{pod.config.riskLimits.maxOpenPositions}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Max Notional Per Trade</span>
+                            <span>单笔最大名义金额</span>
                             <span>${pod.config.riskLimits.maxNotionalPerTrade}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Require Stop Loss</span>
-                            <span>{pod.config.riskLimits.requireStopLoss ? 'Yes' : 'No'}</span>
+                            <span>要求止损</span>
+                            <span>{pod.config.riskLimits.requireStopLoss ? '是' : '否'}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Allow Scale In</span>
-                            <span>{pod.config.riskLimits.allowScaleIn ? 'Yes' : 'No'}</span>
+                            <span>允许加仓</span>
+                            <span>{pod.config.riskLimits.allowScaleIn ? '是' : '否'}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* AI Configuration Section */}
+                {/* AI 配置 */}
                 <div className="detail-section">
-                    <h2>AI Configuration</h2>
+                    <h2>AI 配置</h2>
                     <div className="detail-table">
                         <div className="detail-row">
-                            <span>Regime Weight</span>
+                            <span>市场状态权重</span>
                             <span>{pod.aiProfile.regimeWeight}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Auditor Weight</span>
+                            <span>审计权重</span>
                             <span>{pod.aiProfile.auditorWeight}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Risk Weight</span>
+                            <span>风险权重</span>
                             <span>{pod.aiProfile.riskWeight}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Learning Rate</span>
+                            <span>学习率</span>
                             <span>{pod.aiProfile.learningRate}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Min Samples</span>
+                            <span>最小样本数</span>
                             <span>{pod.aiProfile.minSamples}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Max Delta %</span>
+                            <span>最大变化百分比</span>
                             <span>{pod.aiProfile.maxDeltaPercent}%</span>
                         </div>
                         <div className="detail-row">
-                            <span>Learning Status</span>
+                            <span>学习状态</span>
                             <span className={pod.runtime.learningPaused ? 'negative' : 'positive'}>
-                                {pod.runtime.learningPaused ? 'Paused' : 'Active'}
+                                {pod.runtime.learningPaused ? '已暂停' : '活跃'}
                             </span>
                         </div>
                     </div>
                 </div>
 
-                {/* Strategy & Config Section */}
+                {/* 策略与配置 */}
                 <div className="detail-section">
-                    <h2>Strategy & Config</h2>
+                    <h2>策略与配置</h2>
                     <div className="detail-table">
                         <div className="detail-row">
-                            <span>Strategy</span>
+                            <span>策略类型</span>
                             <span>{pod.config.strategy}</span>
                         </div>
                         <div className="detail-row">
-                            <span>Order Tag Prefix</span>
+                            <span>订单标签前缀</span>
                             <span>{pod.config.orderTagPrefix}</span>
                         </div>
                         <div className="detail-row">
-                            <span>API Errors</span>
+                            <span>API 错误</span>
                             <span className={pod.runtime.errorBudget.apiErrors > 0 ? 'negative' : ''}>
                                 {pod.runtime.errorBudget.apiErrors}
                             </span>
                         </div>
                         <div className="detail-row">
-                            <span>Reconciliation Failures</span>
+                            <span>对账失败</span>
                             <span className={pod.runtime.errorBudget.reconciliationFailures > 0 ? 'negative' : ''}>
                                 {pod.runtime.errorBudget.reconciliationFailures}
                             </span>
@@ -252,19 +251,19 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
                     </div>
                 </div>
 
-                {/* Positions Section */}
+                {/* 持仓列表 */}
                 <div className="detail-section full-width">
-                    <h2>Open Positions ({pod.runtime.positions.length})</h2>
+                    <h2>持仓 ({pod.runtime.positions.length})</h2>
                     {pod.runtime.positions.length === 0 ? (
-                        <p className="no-data">No open positions</p>
+                        <p className="no-data">暂无持仓</p>
                     ) : (
                         <table className="detail-data-table">
                             <thead>
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Quantity</th>
-                                    <th>Avg Price</th>
-                                    <th>Entry Time</th>
+                                    <th>交易对</th>
+                                    <th>数量</th>
+                                    <th>平均价格</th>
+                                    <th>入场时间</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -275,7 +274,7 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
                                             {pos.quantity > 0 ? '+' : ''}{pos.quantity}
                                         </td>
                                         <td>${pos.averagePrice.toFixed(2)}</td>
-                                        <td>{new Date(pos.entryTime).toLocaleString()}</td>
+                                        <td>{new Date(pos.entryTime).toLocaleString('zh-CN')}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -283,21 +282,21 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
                     )}
                 </div>
 
-                {/* Orders Section */}
+                {/* 订单列表 */}
                 <div className="detail-section full-width">
-                    <h2>Recent Orders ({pod.runtime.orders.length})</h2>
+                    <h2>最近订单 ({pod.runtime.orders.length})</h2>
                     {pod.runtime.orders.length === 0 ? (
-                        <p className="no-data">No orders</p>
+                        <p className="no-data">暂无订单</p>
                     ) : (
                         <table className="detail-data-table">
                             <thead>
                                 <tr>
-                                    <th>Order ID</th>
-                                    <th>Symbol</th>
-                                    <th>Side</th>
-                                    <th>Status</th>
-                                    <th>Filled Qty</th>
-                                    <th>Last Update</th>
+                                    <th>订单 ID</th>
+                                    <th>交易对</th>
+                                    <th>方向</th>
+                                    <th>状态</th>
+                                    <th>成交数量</th>
+                                    <th>最后更新</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -306,7 +305,7 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
                                         <td className="monospace">{order.clientOrderId.slice(-8)}</td>
                                         <td>{order.symbol}</td>
                                         <td className={order.side === 'BUY' ? 'positive' : 'negative'}>
-                                            {order.side}
+                                            {order.side === 'BUY' ? '买入' : '卖出'}
                                         </td>
                                         <td>
                                             <span className={`status-badge status-${order.status.toLowerCase()}`}>
@@ -314,7 +313,7 @@ export function PodDetail({ podId, onBack }: PodDetailProps) {
                                             </span>
                                         </td>
                                         <td>{order.filledQuantity}</td>
-                                        <td>{new Date(order.lastUpdate).toLocaleString()}</td>
+                                        <td>{new Date(order.lastUpdate).toLocaleString('zh-CN')}</td>
                                     </tr>
                                 ))}
                             </tbody>

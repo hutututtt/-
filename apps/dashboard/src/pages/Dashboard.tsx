@@ -42,12 +42,12 @@ export function Dashboard({ onNavigateToPod }: DashboardProps) {
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 5000); // Refresh every 5 seconds
+        const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
     }, []);
 
     if (loading) {
-        return <div className="loading">Loading...</div>;
+        return <div className="loading">加载中...</div>;
     }
 
     const totalPnLPercent = summary
@@ -57,38 +57,62 @@ export function Dashboard({ onNavigateToPod }: DashboardProps) {
     return (
         <div className="dashboard">
             <div className="dashboard-header">
-                <h1>Trading System Dashboard</h1>
-                <div className="header-info">
-                    <span>Mode: {summary?.tradingMode}</span>
-                    <span>Build: {summary?.buildVersion}</span>
+                <div>
+                    <h1>交易系统总览</h1>
+                    <div className="header-info">
+                        <span className="info-item">
+                            <span className="info-label">交易模式:</span>
+                            <span className="info-value">{summary?.tradingMode}</span>
+                        </span>
+                        <span className="info-item">
+                            <span className="info-label">版本:</span>
+                            <span className="info-value">{summary?.buildVersion}</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <div className="system-overview">
                 <div className="overview-card">
-                    <label>Global Mode</label>
-                    <div className={`overview-value mode-${summary?.globalMode.toLowerCase()}`}>
+                    <div className="card-header">
+                        <span className="card-icon">🌐</span>
+                        <span className="card-label">全局模式</span>
+                    </div>
+                    <div className={`card-value mode-${summary?.globalMode.toLowerCase()}`}>
                         {summary?.globalMode}
                     </div>
                 </div>
                 <div className="overview-card">
-                    <label>Total Capital</label>
-                    <div className="overview-value">${summary?.totalCapital.toFixed(2)}</div>
+                    <div className="card-header">
+                        <span className="card-icon">💰</span>
+                        <span className="card-label">总资金</span>
+                    </div>
+                    <div className="card-value">${summary?.totalCapital.toFixed(2)}</div>
                 </div>
                 <div className="overview-card">
-                    <label>Total P&L</label>
-                    <div className={`overview-value ${summary && summary.totalPnL >= 0 ? 'positive' : 'negative'}`}>
-                        {summary && summary.totalPnL >= 0 ? '+' : ''}${summary?.totalPnL.toFixed(2)} ({totalPnLPercent}%)
+                    <div className="card-header">
+                        <span className="card-icon">📈</span>
+                        <span className="card-label">总盈亏</span>
+                    </div>
+                    <div className={`card-value ${summary && summary.totalPnL >= 0 ? 'positive' : 'negative'}`}>
+                        {summary && summary.totalPnL >= 0 ? '+' : ''}${summary?.totalPnL.toFixed(2)}
+                        <span className="pnl-percent">({totalPnLPercent}%)</span>
                     </div>
                 </div>
                 <div className="overview-card">
-                    <label>Active Pods</label>
-                    <div className="overview-value">{pods.filter((p) => p.mode !== 'DISABLED').length}</div>
+                    <div className="card-header">
+                        <span className="card-icon">🤖</span>
+                        <span className="card-label">活跃策略</span>
+                    </div>
+                    <div className="card-value">{pods.filter((p) => p.mode !== 'DISABLED').length}</div>
                 </div>
             </div>
 
             <div className="pods-section">
-                <h2>Risk Pods</h2>
+                <div className="section-header">
+                    <h2>策略池</h2>
+                    <span className="section-count">{pods.length} 个策略</span>
+                </div>
                 <div className="pods-grid">
                     {pods.map((pod) => (
                         <PodCard

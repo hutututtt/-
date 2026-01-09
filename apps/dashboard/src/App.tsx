@@ -22,20 +22,33 @@ export default function App() {
   return (
     <div className="app">
       <nav className="main-nav">
-        <div className="nav-brand">自动交易系统</div>
-        <div className="nav-links">
+        <div className="nav-left">
+          <div className="nav-brand">
+            <span className="brand-icon">⚡</span>
+            <span className="brand-text">自动交易系统</span>
+          </div>
+        </div>
+        <div className="nav-center">
           <button
             className={currentPage === 'dashboard' || currentPage === 'pod-detail' ? 'nav-link active' : 'nav-link'}
             onClick={navigateToDashboard}
           >
-            仪表盘
+            <span className="nav-icon">📊</span>
+            <span>仪表盘</span>
           </button>
           <button
             className={currentPage === 'config' ? 'nav-link active' : 'nav-link'}
             onClick={() => setCurrentPage('config')}
           >
-            配置中心
+            <span className="nav-icon">⚙️</span>
+            <span>配置中心</span>
           </button>
+        </div>
+        <div className="nav-right">
+          <div className="status-indicator">
+            <span className="status-dot"></span>
+            <span className="status-text">系统运行中</span>
+          </div>
         </div>
       </nav>
 

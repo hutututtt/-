@@ -25,27 +25,42 @@ export function PodCard({ pod, onClick }: PodCardProps) {
     return (
         <div className="pod-card" onClick={onClick}>
             <div className="pod-card-header">
-                <h3>{pod.name}</h3>
+                <div className="pod-name-section">
+                    <h3>{pod.name}</h3>
+                    <span className="pod-id">#{pod.id}</span>
+                </div>
                 <span className={`mode-badge mode-${pod.mode.toLowerCase()}`}>{pod.mode}</span>
             </div>
 
             <div className="pod-card-stats">
-                <div className="stat">
-                    <label>Capital</label>
-                    <div className="stat-value">${pod.currentCapital.toFixed(2)}</div>
+                <div className="stat-row">
+                    <span className="stat-label">当前资金</span>
+                    <span className="stat-value">${pod.currentCapital.toFixed(2)}</span>
                 </div>
-                <div className="stat">
-                    <label>P&L</label>
-                    <div className={`stat-value ${isProfitable ? 'positive' : 'negative'}`}>
-                        {isProfitable ? '+' : ''}${pod.pnl.toFixed(2)} ({pnlPercent}%)
-                    </div>
+                <div className="stat-row">
+                    <span className="stat-label">盈亏</span>
+                    <span className={`stat-value ${isProfitable ? 'positive' : 'negative'}`}>
+                        {isProfitable ? '+' : ''}${pod.pnl.toFixed(2)}
+                        <span className="pnl-percent">({pnlPercent}%)</span>
+                    </span>
                 </div>
             </div>
 
             <div className="pod-card-footer">
-                <span>Positions: {pod.openPositions}</span>
-                <span>Orders: {pod.activeOrders}</span>
-                <span>Errors: {pod.errorBudget.apiErrors + pod.errorBudget.reconciliationFailures}</span>
+                <div className="footer-item">
+                    <span className="footer-label">持仓</span>
+                    <span className="footer-value">{pod.openPositions}</span>
+                </div>
+                <div className="footer-item">
+                    <span className="footer-label">订单</span>
+                    <span className="footer-value">{pod.activeOrders}</span>
+                </div>
+                <div className="footer-item">
+                    <span className="footer-label">错误</span>
+                    <span className={`footer-value ${pod.errorBudget.apiErrors + pod.errorBudget.reconciliationFailures > 0 ? 'error' : ''}`}>
+                        {pod.errorBudget.apiErrors + pod.errorBudget.reconciliationFailures}
+                    </span>
+                </div>
             </div>
         </div>
     );

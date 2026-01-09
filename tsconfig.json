@@ -56,6 +56,9 @@
       "@server/*": [
         "src/server/*"
       ],
+      "@health/*": [
+        "src/health/*"
+      ],
       "@shared-types": [
         "packages/shared-types/src/index.ts"
       ]
