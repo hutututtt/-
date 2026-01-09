@@ -6,6 +6,7 @@ import { executionAdmissionGate } from '@risk/gates.js';
 import { PodRuntime } from '@pods/podManager.js';
 import { appendEvent } from '@utils/eventStore.js';
 import { writeTradeReport } from '@reports/tradeReport.js';
+import { eventStreamManager } from '@server/eventStream.js';
 
 export async function reconciliationLoop(
   broker: ExchangeBroker,
@@ -14,6 +15,8 @@ export async function reconciliationLoop(
   pods: PodRuntime[],
   thresholds: { safe: number; crash: number }
 ) {
+  let discrepancies = 0;
+
   try {
     const [exchangeOrders, exchangePositions] = await Promise.all([
       broker.fetchOrders(),
@@ -26,6 +29,7 @@ export async function reconciliationLoop(
         return;
       }
       if (!pod.orders.isDuplicate(order.clientOrderId)) {
+        discrepancies++;
         broker.cancelOrder(order.clientOrderId).then(() => {
           const event: OrderLifecycleEvent = {
             type: 'OrderLifecycleEvent',
@@ -56,6 +60,7 @@ export async function reconciliationLoop(
       }
       const fsmPosition = pod.positions.getPosition(position.podId, position.symbol);
       if (!fsmPosition && position.quantity !== 0) {
+        discrepancies++;
         const reduceIntent = executionAdmissionGate({
           podId: position.podId,
           symbol: position.symbol,
@@ -83,9 +88,29 @@ export async function reconciliationLoop(
         }
       }
     });
+
+    // Broadcast successful reconciliation
+    pods.forEach((pod) => {
+      eventStreamManager.broadcast({
+        type: 'ReconciliationEvent',
+        podId: pod.config.id,
+        status: 'SUCCESS',
+        discrepancies,
+        timestamp: Date.now()
+      });
+    });
   } catch (error) {
     pods.forEach((pod) => {
       pod.errorBudget.reconciliationFailures += 1;
+
+      // Broadcast failed reconciliation
+      eventStreamManager.broadcast({
+        type: 'ReconciliationEvent',
+        podId: pod.config.id,
+        status: 'FAILURE',
+        discrepancies: 0,
+        timestamp: Date.now()
+      });
     });
     if (pods.some((pod) => pod.errorBudget.reconciliationFailures >= thresholds.crash)) {
       globalMode.upgrade('CRASH');
@@ -100,5 +125,6 @@ export async function reconciliationLoop(
       timestamp: Date.now()
     };
     appendEvent(event);
+    eventStreamManager.broadcast(event);
   }
 }

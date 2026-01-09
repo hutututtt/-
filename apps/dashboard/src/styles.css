@@ -619,3 +619,170 @@ body {
   font-size: 1.25rem;
   color: #8b949e;
 }
+/* Pod Detail Page */
+.pod-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pod-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.back-button {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background: #30363d;
+}
+
+.pod-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.detail-section {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.detail-section.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-section h2 {
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  color: #58a6ff;
+}
+
+.detail-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.detail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-stat label {
+  color: #8b949e;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.detail-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row span:first-child {
+  color: #8b949e;
+}
+
+.detail-row span:last-child {
+  color: #e6edf3;
+  font-weight: 500;
+}
+
+.detail-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-data-table th {
+  background: #0d1117;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #30363d;
+  font-size: 0.875rem;
+}
+
+.detail-data-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #21262d;
+  font-size: 0.875rem;
+}
+
+.detail-data-table tr:hover {
+  background: #0d1117;
+}
+
+.no-data {
+  color: #8b949e;
+  text-align: center;
+  padding: 2rem;
+}
+
+.monospace {
+  font-family: 'Courier New', monospace;
+  color: #79c0ff;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-ack {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.status-partial {
+  background: #d29922;
+  color: #fff;
+}
+
+.status-filled {
+  background: #238636;
+  color: #fff;
+}
+
+.status-canceled,
+.status-rejected {
+  background: #6e7681;
+  color: #fff;
+}
+
+.hint {
+  color: #8b949e;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}

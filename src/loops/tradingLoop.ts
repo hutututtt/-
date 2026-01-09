@@ -9,6 +9,7 @@ import { coreTrendStrategy } from '@strategies/coreTrend.js';
 import { specMomentumStrategy } from '@strategies/specMomentum.js';
 import { appendEvent } from '@utils/eventStore.js';
 import { writeTradeReport } from '@reports/tradeReport.js';
+import { eventStreamManager } from '@server/eventStream.js';
 
 export type MarketSnapshotGenerator = () => {
   symbol: string;
@@ -48,6 +49,7 @@ export async function tradingLoop(
       timestamp: Date.now()
     };
     appendEvent(riskEvent);
+    eventStreamManager.broadcast(riskEvent);
   }
 
   if (snapshot.volatility > 0.9) {
@@ -63,6 +65,7 @@ export async function tradingLoop(
       timestamp: Date.now()
     };
     appendEvent(riskEvent);
+    eventStreamManager.broadcast(riskEvent);
   }
 
   for (const pod of pods) {
@@ -74,7 +77,7 @@ export async function tradingLoop(
           const reduceIntent = executionAdmissionGate({
             podId: pod.config.id,
             symbol: pos.symbol,
-            side: pos.quantity > 0 ? 'SELL' : 'BUY',
+            side: pos.quantity > 0 ? ('SELL' as const) : ('BUY' as const),
             quantity: Math.abs(pos.quantity),
             reduceOnly: true,
             clientOrderId: `${pod.config.orderTagPrefix}-SAFE-${Date.now()}`,
@@ -87,6 +90,17 @@ export async function tradingLoop(
             if (result.fillEvent) {
               pod.positions.apply(result.fillEvent);
               appendEvent(result.fillEvent);
+
+              // Broadcast TradeEvent
+              eventStreamManager.broadcast({
+                type: 'TradeEvent',
+                podId: pod.config.id,
+                symbol: result.fillEvent.symbol,
+                side: result.fillEvent.side,
+                quantity: result.fillEvent.quantity,
+                price: result.fillEvent.price,
+                timestamp: result.fillEvent.timestamp
+              });
             }
             writeTradeReport({
               timestamp: Date.now(),
@@ -107,6 +121,14 @@ export async function tradingLoop(
       dataQuality: snapshot.dataQuality
     });
     if (!preTrade.allowed) {
+      // Broadcast RiskEvent for blocked trade
+      eventStreamManager.broadcast({
+        type: 'RiskEvent',
+        podId: pod.config.id,
+        level: 'INFO',
+        reason: `PreTrade gate blocked: ${preTrade.reason}`,
+        timestamp: Date.now()
+      });
       writeTradeReport({
         timestamp: Date.now(),
         podId: pod.config.id,
@@ -144,7 +166,7 @@ export async function tradingLoop(
     const intent = {
       podId: pod.config.id,
       symbol: signal.symbol,
-      side: signal.action === 'BUY' ? 'BUY' : 'SELL',
+      side: signal.action === 'BUY' ? ('BUY' as const) : ('SELL' as const),
       quantity: pod.config.riskLimits.maxNotionalPerTrade,
       reduceOnly: false,
       stopLossPrice: snapshot.price * 0.98,
@@ -154,6 +176,14 @@ export async function tradingLoop(
 
     const permission = orderPermissionGate(pod.config, intent, openPositions);
     if (!permission.allowed) {
+      // Broadcast RiskEvent for blocked order
+      eventStreamManager.broadcast({
+        type: 'RiskEvent',
+        podId: pod.config.id,
+        level: 'WARN',
+        reason: `Order permission gate blocked: ${permission.reason}`,
+        timestamp: Date.now()
+      });
       writeTradeReport({
         timestamp: Date.now(),
         podId: pod.config.id,
@@ -177,6 +207,19 @@ export async function tradingLoop(
     if (result.fillEvent) {
       pod.positions.apply(result.fillEvent);
       appendEvent(result.fillEvent);
+
+      // Broadcast TradeEvent for successful trade
+      const pnl = pod.currentCapital - pod.config.capitalPool;
+      eventStreamManager.broadcast({
+        type: 'TradeEvent',
+        podId: pod.config.id,
+        symbol: result.fillEvent.symbol,
+        side: result.fillEvent.side,
+        quantity: result.fillEvent.quantity,
+        price: result.fillEvent.price,
+        pnl,
+        timestamp: result.fillEvent.timestamp
+      });
     }
     pod.currentCapital -= intent.quantity;
     if (pod.config.id === 'spec' && pod.currentCapital <= 0) {

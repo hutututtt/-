@@ -29,7 +29,7 @@ export function createPods(
   const frozenConfigs = frozenCopy(podConfigs);
   return frozenConfigs.map((config) => {
     const podCheckpoint = checkpoint?.pods.find((pod) => pod.podId === config.id) ?? null;
-    const mode = new ModeFSM(podCheckpoint?.mode ?? config.mode);
+    const mode = new ModeFSM(podCheckpoint?.mode ?? config.mode, config.id);
     const orders = new OrderFSM();
     const positions = new PositionFSM();
     if (podCheckpoint) {

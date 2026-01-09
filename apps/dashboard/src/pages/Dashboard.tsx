@@ -11,7 +11,11 @@ type SystemSummary = {
     totalPnL: number;
 };
 
-export function Dashboard() {
+type DashboardProps = {
+    onNavigateToPod: (podId: string) => void;
+};
+
+export function Dashboard({ onNavigateToPod }: DashboardProps) {
     const [summary, setSummary] = useState<SystemSummary | null>(null);
     const [pods, setPods] = useState<PodStatus[]>([]);
     const [loading, setLoading] = useState(true);
@@ -90,10 +94,7 @@ export function Dashboard() {
                         <PodCard
                             key={pod.id}
                             pod={pod}
-                            onClick={() => {
-                                // Navigate to pod detail (will implement later)
-                                console.log('Navigate to pod:', pod.id);
-                            }}
+                            onClick={() => onNavigateToPod(pod.id)}
                         />
                     ))}
                 </div>
