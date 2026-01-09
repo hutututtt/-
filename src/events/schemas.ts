@@ -87,6 +87,17 @@ export const RiskEventSchema = z.object({
   timestamp: z.number()
 });
 
+export const TradeEventSchema = z.object({
+  type: z.literal('TradeEvent'),
+  podId: z.string(),
+  symbol: z.string(),
+  side: z.enum(['BUY', 'SELL']),
+  quantity: z.number(),
+  price: z.number(),
+  pnl: z.number().optional(),
+  timestamp: z.number()
+});
+
 export type MarketEvent = z.infer<typeof MarketEventSchema>;
 export type SignalEvent = z.infer<typeof SignalEventSchema>;
 export type AiRecommendationEvent = z.infer<typeof AiRecommendationSchema>;
@@ -96,3 +107,4 @@ export type OrderLifecycleEvent = z.infer<typeof OrderLifecycleSchema>;
 export type FillEvent = z.infer<typeof FillEventSchema>;
 export type PositionEvent = z.infer<typeof PositionEventSchema>;
 export type RiskEvent = z.infer<typeof RiskEventSchema>;
+export type TradeEvent = z.infer<typeof TradeEventSchema>;

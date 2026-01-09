@@ -9,7 +9,8 @@ import { tradingLoop } from '@loops/tradingLoop.js';
 import { createPods, snapshotPods } from '@pods/podManager.js';
 import { loadConfigRegistry } from '@config/registry.js';
 import { loadCheckpoint, saveCheckpoint } from '@state/checkpoint.js';
-import { startConfigServer } from '@server/configServer.js';
+import { startConfigServer, setPodRuntimeReference } from '@server/configServer.js';
+import { eventStreamManager } from '@server/eventStream.js';
 
 const tradingMode = (process.env.TRADING_MODE ?? 'DRY_RUN') as TradingMode;
 
@@ -48,6 +49,14 @@ setInterval(() => {
 
 setInterval(() => {
   heartbeat(globalMode.current, pods);
+
+  // Broadcast heartbeat event
+  eventStreamManager.broadcast({
+    type: 'HeartbeatEvent',
+    globalMode: globalMode.current,
+    activePods: pods.filter((p) => p.mode.current !== 'DISABLED').length,
+    timestamp: Date.now()
+  });
 }, tradingIntervals.heartbeatIntervalMs);
 
 setInterval(() => {
@@ -57,6 +66,9 @@ setInterval(() => {
     lastCycleId: cycleId
   });
 }, tradingIntervals.checkpointIntervalMs);
+
+// Set pod runtime references for API access
+setPodRuntimeReference(pods, globalMode);
 
 startConfigServer(configRegistry, Number(process.env.CONFIG_PORT ?? 3001));
 

@@ -20,6 +20,7 @@
     "dashboard:preview": "npm --workspace apps/dashboard run preview"
   },
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
     "fastify": "^4.28.1",
     "yaml": "^2.5.1",
     "zod": "^3.23.8"
@@ -29,8 +30,8 @@
     "@typescript-eslint/parser": "^8.1.0",
     "eslint": "^9.8.0",
     "eslint-plugin-boundaries": "^4.0.0",
-    "typescript": "^5.6.2",
     "tsx": "^4.19.0",
+    "typescript": "^5.6.2",
     "vitest": "^2.1.1"
   }
 }
