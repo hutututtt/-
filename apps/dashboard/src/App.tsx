@@ -22,19 +22,19 @@ export default function App() {
   return (
     <div className="app">
       <nav className="main-nav">
-        <div className="nav-brand">Autopilot Trader</div>
+        <div className="nav-brand">自动交易系统</div>
         <div className="nav-links">
           <button
             className={currentPage === 'dashboard' || currentPage === 'pod-detail' ? 'nav-link active' : 'nav-link'}
             onClick={navigateToDashboard}
           >
-            Dashboard
+            仪表盘
           </button>
           <button
             className={currentPage === 'config' ? 'nav-link active' : 'nav-link'}
             onClick={() => setCurrentPage('config')}
           >
-            Config Center
+            配置中心
           </button>
         </div>
       </nav>
