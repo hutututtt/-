@@ -18,10 +18,25 @@ export async function reconciliationLoop(
   let discrepancies = 0;
 
   try {
-    const [exchangeOrders, exchangePositions] = await Promise.all([
+    const [exchangeOrders, exchangePositions, exchangeBalance] = await Promise.all([
       broker.fetchOrders(),
-      broker.fetchPositions()
+      broker.fetchPositions(),
+      broker.fetchBalance()
     ]);
+
+    // Update pod capital from exchange balance
+    console.log('[RECONCILIATION] Exchange balance:', exchangeBalance);
+    
+    // For now, distribute total balance proportionally across pods based on their capital pool
+    const totalCapitalPool = pods.reduce((sum, pod) => sum + pod.config.capitalPool, 0);
+    pods.forEach((pod) => {
+      if (totalCapitalPool > 0) {
+        const proportion = pod.config.capitalPool / totalCapitalPool;
+        const newCapital = exchangeBalance.available * proportion;
+        console.log(`[RECONCILIATION] Pod ${pod.config.id}: ${pod.currentCapital} -> ${newCapital}`);
+        pod.currentCapital = newCapital;
+      }
+    });
 
     exchangeOrders.forEach((order) => {
       const pod = pods.find((p) => p.config.id === order.podId);

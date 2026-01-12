@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Dashboard } from './pages/Dashboard';
 import { ConfigCenter } from './pages/ConfigCenter';
 import { PodDetail } from './pages/PodDetail';
+import { Settings } from './pages/Settings';
 
-type Page = 'dashboard' | 'config' | 'pod-detail';
+type Page = 'dashboard' | 'config' | 'pod-detail' | 'settings';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
@@ -43,6 +44,13 @@ export default function App() {
             <span className="nav-icon">⚙️</span>
             <span>配置中心</span>
           </button>
+          <button
+            className={currentPage === 'settings' ? 'nav-link active' : 'nav-link'}
+            onClick={() => setCurrentPage('settings')}
+          >
+            <span className="nav-icon">🔐</span>
+            <span>系统设置</span>
+          </button>
         </div>
         <div className="nav-right">
           <div className="status-indicator">
@@ -55,6 +63,7 @@ export default function App() {
       <main className="main-content">
         {currentPage === 'dashboard' && <Dashboard onNavigateToPod={navigateToPodDetail} />}
         {currentPage === 'config' && <ConfigCenter />}
+        {currentPage === 'settings' && <Settings />}
         {currentPage === 'pod-detail' && selectedPodId && (
           <PodDetail podId={selectedPodId} onBack={navigateToDashboard} />
         )}

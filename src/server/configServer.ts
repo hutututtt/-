@@ -5,13 +5,19 @@ import { ConfigRegistry, derivePodsEnabled } from '@config/registry.js';
 import { eventStreamManager } from '@server/eventStream.js';
 import { PodRuntime } from '@pods/podManager.js';
 import { ModeFSM } from '@fsm/modeFsm.js';
+import { ExchangeBroker } from '@exchange/types.js';
+import { loadCredentials, saveCredentials, getMaskedCredentials, OkxCredentials } from '@config/credentials.js';
 
 let podsRef: PodRuntime[] = [];
 let globalModeRef: ModeFSM | null = null;
+let brokerRef: ExchangeBroker | null = null;
 
-export function setPodRuntimeReference(pods: PodRuntime[], globalMode: ModeFSM) {
+export function setPodRuntimeReference(pods: PodRuntime[], globalMode: ModeFSM, broker?: ExchangeBroker) {
   podsRef = pods;
   globalModeRef = globalMode;
+  if (broker) {
+    brokerRef = broker;
+  }
 }
 
 export async function startConfigServer(registry: ConfigRegistry, port = 3001) {
@@ -24,7 +30,26 @@ export async function startConfigServer(registry: ConfigRegistry, port = 3001) {
   });
 
   app.get('/api/config/summary', async () => {
-    const totalCapital = podsRef.reduce((sum, pod) => sum + pod.config.capitalPool, 0);
+    let totalCapital = 0;
+
+    // Try to fetch real balance from exchange
+    if (brokerRef) {
+      try {
+        const balance = await brokerRef.fetchBalance();
+        totalCapital = balance.total;
+        console.log('[Config Server] Fetched balance from exchange:', totalCapital);
+      } catch (error) {
+        console.error('[Config Server] Failed to fetch balance from exchange:', error);
+        // Fallback to config capitalPool
+        totalCapital = podsRef.reduce((sum, pod) => sum + pod.config.capitalPool, 0);
+        console.log('[Config Server] Using fallback capitalPool:', totalCapital);
+      }
+    } else {
+      // No broker available, use config capitalPool
+      totalCapital = podsRef.reduce((sum, pod) => sum + pod.config.capitalPool, 0);
+      console.log('[Config Server] No broker available, using capitalPool:', totalCapital);
+    }
+
     const totalPnL = podsRef.reduce((sum, pod) => {
       const pnl = pod.currentCapital - pod.config.capitalPool;
       return sum + pnl;
@@ -111,7 +136,9 @@ export async function startConfigServer(registry: ConfigRegistry, port = 3001) {
     reply.raw.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': 'true'
     });
 
     eventStreamManager.addClient(reply);
@@ -120,6 +147,37 @@ export async function startConfigServer(registry: ConfigRegistry, port = 3001) {
     request.raw.on('close', () => {
       eventStreamManager.removeClient(reply);
     });
+  });
+
+  // Credentials management endpoints
+  app.get('/api/credentials', async () => {
+    return { credentials: getMaskedCredentials() };
+  });
+
+  app.post('/api/credentials', async (request, reply) => {
+    try {
+      const credentials = request.body as OkxCredentials;
+      
+      // 验证必填字段
+      if (!credentials.paperApiKey || !credentials.paperApiSecret || !credentials.paperApiPassphrase) {
+        reply.code(400);
+        return { error: '模拟盘 API 凭证不完整' };
+      }
+
+      saveCredentials(credentials);
+      
+      console.log(`[ADMIN ACTION] Credentials updated at ${new Date().toISOString()}`);
+      
+      return { 
+        success: true, 
+        message: '凭证已保存，请重启系统以应用新配置',
+        credentials: getMaskedCredentials() 
+      };
+    } catch (error) {
+      console.error('Failed to save credentials:', error);
+      reply.code(500);
+      return { error: '保存凭证失败' };
+    }
   });
 
   // Emergency operations (controlled write operations)

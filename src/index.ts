@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { MockExchange } from '@exchange/mockExchange.js';
 import { OkxBroker } from '@exchange/okxBroker.js';
 import { ExchangeBroker, TradingMode } from '@exchange/types.js';
@@ -19,7 +20,9 @@ const checkpoint = loadCheckpoint();
 const globalMode = new ModeFSM(checkpoint?.globalMode ?? 'NORMAL');
 const pods = createPods(Object.values(configRegistry.pods.values), configRegistry.ai.values, checkpoint);
 
-const broker: ExchangeBroker = tradingMode === 'LIVE' ? new OkxBroker() : new MockExchange();
+const broker: ExchangeBroker = tradingMode === 'DRY_RUN'
+  ? new MockExchange()
+  : new OkxBroker(tradingMode);
 const executionEngine = new ExecutionEngine(broker);
 
 let cycleId = checkpoint?.lastCycleId ?? 0;
@@ -28,7 +31,7 @@ const snapshotGenerator = () => ({
   symbol: 'BTC-USDT',
   price: Number((Math.random() * 10000 + 20000).toFixed(2)),
   timestamp: Date.now(),
-  dataQuality: Math.random() > 0.9 ? 'DELAYED' : 'GOOD',
+  dataQuality: (Math.random() > 0.9 ? 'DELAYED' : 'GOOD') as 'DELAYED' | 'GOOD' | 'GAPPED',
   volatility: Math.random()
 });
 
@@ -68,7 +71,7 @@ setInterval(() => {
 }, tradingIntervals.checkpointIntervalMs);
 
 // Set pod runtime references for API access
-setPodRuntimeReference(pods, globalMode);
+setPodRuntimeReference(pods, globalMode, broker);
 
 startConfigServer(configRegistry, Number(process.env.CONFIG_PORT ?? 3001));
 
